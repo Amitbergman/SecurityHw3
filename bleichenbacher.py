@@ -211,7 +211,7 @@ def bleichenbacher_attack(k, key, c, oracle, verbose=False):
         print("length of m is ", len(m), "the size is", m[0][1] - m[0][0])
         if len(m) == 1 and m[0][0] == m[0][1]:
             a = m[0][0]
-            result = modinv(s, key.n) * a
+            result = (modinv(s_0, key.n) * a) %key.n
             break
         i += 1
 

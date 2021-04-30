@@ -136,7 +136,7 @@ def search_single_interval(B, prev_s, a, b, c_0, key, k):
     :param c_0: integer that represents a conforming ciphertext
     :return: s s.t. (c_0 * (s ** e)) mod n represents a conforming ciphertext
     """
-    minimal_r_i =  divfloor(2* (b * prev_s - 2  * B), key.n)
+    minimal_r_i =  2 * divfloor(b * prev_s - 2  * B, key.n)
     current_r = minimal_r_i -1
     
     while (True):

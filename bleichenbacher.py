@@ -140,6 +140,8 @@ def search_single_interval(B, prev_s, a, b, c_0, key, k):
     current_r = minimal_r_i -1
     
     while (True):
+        if (current_r %15000 ==0):
+            print("index in search single is ", current_r)
         current_r +=1
         s_minimal = divceil(2 * B + current_r * key.n, b)
         s_maximal = divfloor(3 * B + current_r * key.n, a)

@@ -91,7 +91,7 @@ def blinding(k, key, c, oracle):
     ind = 1
     while True:
         ind +=1
-        if (ind % 1000 ==0):
+        if (ind % 15000 ==0):
             print(ind)
         s_0 = urandom(k)
         s_0 = int.from_bytes(s_0, byteorder='big') % key.n
@@ -116,7 +116,7 @@ def find_min_conforming(key, c_0, min_s, oracle, k):
     ind = 0
     while True:
         ind+=1
-        if (ind % 1000 ==0):
+        if (ind % 15000 ==0):
             print("ind in find min is ", ind)
         power = pow(current, key.e, key.n)
         to_send_to_oracle = (c_0 * power)%key.n
@@ -166,7 +166,7 @@ def narrow_m(key, m_prev, s, B):
         for r in range(min_r, max_r + 1):
             start = max(a, divceil(2 * B + r * key.n, s))
             end = min(b, divfloor(3 * B  - 1 + r *key.n, s))
-            if (start >= end):
+            if (start > end):
                 print("problem - not working interval")
             else:
                 intervals.append((start, end))
@@ -206,7 +206,7 @@ def bleichenbacher_attack(k, key, c, oracle, verbose=False):
             s = search_single_interval(B, s, a, b, c_0, key, k)
 
         m = narrow_m(key, m, s, B)
-        print("length of m is ", len(m))
+        print("length of m is ", len(m), "the size is", m[0][1] - m[0][0])
         if len(m) == 1 and m[0][0] == m[0][1]:
             a = m[0][0]
             result = modinv(s, key.n) * a

@@ -144,7 +144,7 @@ def search_single_interval(B, prev_s, a, b, c_0, key, k):
             print("index in search single is ", current_r)
         current_r +=1
         s_minimal = divceil(2 * B + current_r * key.n, b)
-        s_maximal = divceil(a, b)(3 * B + current_r * key.n, a)
+        s_maximal = divceil(3 * B + current_r * key.n, a)
         for s_value in range(s_minimal, s_maximal):
             power = pow(s_value, key.e, key.n)
             to_send_to_oracle = (c_0 * power)%key.n

@@ -99,8 +99,6 @@ def blinding(k, key, c, oracle):
         to_send_to_oracle = (s_0_power_e * c) %key.n
         to_send_to_oracle_as_bytes_arary = to_send_to_oracle.to_bytes(k, byteorder='big')
         if (oracle.query(to_send_to_oracle_as_bytes_arary) == True):
-            print(to_send_to_oracle_as_bytes_arary)
-            print(to_send_to_oracle,  "is the number")
             return s_0, to_send_to_oracle
 
 def find_min_conforming(key, c_0, min_s, oracle, k):
@@ -116,8 +114,6 @@ def find_min_conforming(key, c_0, min_s, oracle, k):
     ind = 0
     while True:
         ind+=1
-        if (ind % 15000 ==0):
-            print("ind in find min is ", ind)
         power = pow(current, key.e, key.n)
         to_send_to_oracle = (c_0 * power)%key.n
         to_send_to_oracle_as_bytes_arary = to_send_to_oracle.to_bytes(k, byteorder='big')
@@ -140,8 +136,6 @@ def search_single_interval(B, prev_s, a, b, c_0, key, k):
     current_r = minimal_r_i -1
     
     while (True):
-        if (current_r %15000 ==0):
-            print("index in search single is ", current_r)
         current_r +=1
         s_minimal = divceil(2 * B + current_r * key.n, b)
         s_maximal = divceil(3 * B + current_r * key.n, a)
@@ -208,7 +202,6 @@ def bleichenbacher_attack(k, key, c, oracle, verbose=False):
             s = search_single_interval(B, s, a, b, c_0, key, k)
 
         m = narrow_m(key, m, s, B)
-        print("length of m is ", len(m), "the size is", m[0][1] - m[0][0])
         if len(m) == 1 and m[0][0] == m[0][1]:
             a = m[0][0]
             result = (modinv(s_0, key.n) * a) %key.n

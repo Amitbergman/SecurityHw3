@@ -5,7 +5,7 @@ https://www.iacr.org/archive/crypto2001/21390229.pdf
 from oracles import PKCS1_OAEP_Oracle
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
-
+import math
 
 def divceil(a, b):
     """
@@ -30,6 +30,9 @@ def divfloor(a, b):
     q, r = divmod(a, b)
     return q
 
+def tryWithOracle(number, key, c, oracle, k): #smaller returns true
+    to_send_to_oracle = (pow(number, key.e, key.n) * c)%key.n
+    return oracle.query(to_send_to_oracle.to_bytes(k, byteorder='big'))
 
 def find_f1(k, key, c, oracle):
     """
@@ -41,8 +44,12 @@ def find_f1(k, key, c, oracle):
     :return: f1 such that B/2 <= f1 * m / 2 < B
     """
     f1 = 2
-    ?
-
+    while (True):
+        oracle_result = tryWithOracle(f1, key, c, oracle, k)
+        if(oracle_result == True):
+            f1 = f1*2
+        else:
+            return f1
 
 def find_f2(k, key, c, f1, oracle):
     """
@@ -55,7 +62,13 @@ def find_f2(k, key, c, f1, oracle):
     :return: f2 such that n <= f2 * m < n + B
     """
     B = 2 ** (8 * (k - 1))
-    ?
+    f2 = int(divfloor(key.n + B, B) * (f1 / 2))
+    while (True):
+        oracle_result = tryWithOracle(f2, key, c, oracle, k)
+        if (oracle_result == False): # More than B
+            f2 = int(f2 + f1 / 2)
+        else:
+            return f2
 
 
 def find_m(k, key, c, f2, oracle, verbose=False):
@@ -70,12 +83,22 @@ def find_m(k, key, c, f2, oracle, verbose=False):
     """
     B = 2 ** (8 * (k - 1))
     m_min = divceil(key.n, f2)
+    original_min = m_min
     m_max = divfloor(key.n + B, f2)
+    original_max = m_max
     count = 0
     while m_max != m_min:
         if verbose:
             print("Round", count)
-        ?
+        count = count + 1
+        f_temp = divfloor(2 * B , m_max - m_min)
+        i = divfloor(f_temp * m_min, key.n)
+        f3 = divceil(i * key.n, m_min)
+        oracle_result = tryWithOracle(f3, key, c, oracle, k)
+        if (oracle_result == False): #bigger than B
+            m_min = divceil(i * key.n + B, f3)
+        else:
+            m_max = divfloor(i * key.n + B, f3)
     return m_min
 
 
@@ -99,7 +122,7 @@ def manger_attack(k, key, c, oracle, verbose=False):
     if verbose:
         print("f2 =", f2)
 
-    m = find_m(k, key, c, f2, oracle, True)
+    m = find_m(k, key, c, f2, oracle, False)
 
     # Test the result - if implemented properly the attack should always succeed
     if pow(m, key.e, key.n) == c:
@@ -121,5 +144,6 @@ if __name__ == "__main__":
     message = b'secret message'
     c = cipher.encrypt(message)
 
-    result = manger_attack(k, pub_key, c, oracle, True)
+    result = manger_attack(k, pub_key, c, oracle, False)
     print(result)
+    
